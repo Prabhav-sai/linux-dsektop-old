@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="video_cus.css">
+    <title>Make Video</title>
+</head>
+
+<body>
+    <div class="main">
+        <div class="header">
+            <h1>Make Video</h1>
+        </div>
+        <div class="display-img">
+            <img src="img1.jpeg" alt="img" class="onclicks"><img src="img2.jpeg" alt="img" class="onclicks"><img
+                src="img3.jpeg" alt="img" class="onclicks">
+            <img src="img1.jpeg" alt="img" class="onclicks"><img src="img2.jpeg" alt="img" class="onclicks"><img
+                src="img3.jpeg" alt="img" class="onclicks">
+            <img src="img1.jpeg" alt="img" class="onclicks"><img src="img2.jpeg" alt="img" class="onclicks"><img
+                src="img3.jpeg" alt="img" class="onclicks">
+        </div>
+        <form class="queued-form">
+            <div class="header">
+                <h3>Selected Images</h3>
+            </div>
+            <div class="queue"></div>
+        </form>
+    </div>
+    <div class="video">
+        <p>BackgroundMusic :</p>
+        <input type="file" id="backgroundMusic" accept="audio/*" placeholder="click to add music">
+        <label for="imageDuration">Image Duration (in seconds):</label>
+        <input type="number" id="imageDuration" min="1" step="1" value="5">
+        <label for="transitionEffect">Transition Effect:</label>
+        <select id="transitionEffect">
+            <option value="fade">Fade</option>
+            <option value="slide">Slide</option>
+        </select>
+        <br>
+        <button onclick="preview()">Preview Video</button><br>
+        <video width="200px" controls id="preview">
+            <source src="video.mp4" type="video/mp4">
+        </video><br>
+        <button onclick="final()">Create Video</button><br>
+        <video width="200px" controls id="final">
+            <source src="video.mp4" type="video/mp4">
+        </video>x
+    </div>
+    <script src="video_cus.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login page</title>
+    <!-- <link rel="stylesheet" href="authentication.css"> -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #084a41;
+        }
+
+        #form {
+            position: relative;
+            top: 15vh;
+            display: flex;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgb(202, 107, 107);
+            flex-direction: column;
+            width: 30%;
+            margin: auto;
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        #details {
+            margin: auto;
+            display: flex;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input {
+            width: 80%;
+            height: 30px;
+            margin-bottom: 15px;
+            padding: 5px;
+            border: 1px solid #25827d;
+            border-radius: 5px;
+        }
+
+        .Name,
+        #name,
+        #email {
+            transition: all 0.2s;
+        }
+
+        #action {
+            display: flex;
+            width: 40%;
+            height: 4em;
+            background-color: #ddd;
+            margin: auto;
+            justify-content: space-evenly;
+            align-items: center;
+            border-radius: 40px;
+        }
+
+        #login,
+        #signup {
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        #login:hover,
+        #signup:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        #send {
+            width: 30%;
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #25827d;
+            border-radius: 10px;
+            text-decoration: none;
+            text-align: center;
+            color: black;
+            margin-bottom: 10px;
+        }
+
+        @media only screen and (max-width: 768px) {
+            #form {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="form">
+        <div id="action">
+            <button id="login" onclick="Login()">login</button>
+            <span>/</span>
+            <button id="signup" onclick="Signup()">sign up</button>
+        </div>
+        <form id="details">
+            <label for="name" class="Name">Name:</label>
+            <input type="text" id="name" name="name" placeholder="name" required>
+            <label for="email" class="Email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="email" required>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="password" required>
+            <button id="send" onclick="send_signup()">Submit</button>
+        </form>
+    </div>
+    <script>
+        let login = false;
+        let signup = true;
+        function Login() {
+            if (!login) {
+                document.querySelector("#name").style.display = "none";
+                document.querySelector("#email").style.display = "none";
+                document.querySelector(".Name").style.display = "none";
+                document.querySelector(".Email").style.display = "none";
+                document.querySelector("#login").style.backgroundColor = "#25827d";
+                document.querySelector("#signup").style.backgroundColor = "white";
+                document.querySelector("#form").style.top = "30vh";
+                document.querySelector("#send").setAttribute("onclick", "send_login()");
+                login = true;
+                signup = false;
+            }
+        }
+
+        function Signup() {
+            if (!signup) {
+                document.querySelector("#name").style.display = "block";
+                document.querySelector("#email").style.display = "block";
+                document.querySelector(".Name").style.display = "block";
+                document.querySelector(".Email").style.display = "block";
+                document.querySelector("#login").style.backgroundColor = "white";
+                document.querySelector("#signup").style.backgroundColor = "#25827d";
+                document.querySelector("#form").style.top = "15vh";
+                document.querySelector("#send").setAttribute("onclick", "send_signup()");
+                login = false;
+                signup = true;
+            }
+        }
+        function send_login() {
+            let username = document.querySelector("#username").value;
+            let password = document.querySelector("#password").value;
+            alert("going");
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle success, e.g., redirect to homepage
+                    const token = data.access_token;
+                    localStorage.setItem('token', token);
+                    Auth();
+                })
+                .catch(error => {
+                    // Handle error
+                    console.error('Login failed:', error);
+                });
+        }
+        function Auth() {
+            fetch('/protected', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    const username = data.logged_in_as;
+                    window.location.href = "/home_page";
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function send_signup() {
+            let name = document.querySelector("#name").value;
+            let email = document.querySelector("#email").value;
+            let username = document.querySelector("#username").value;
+            let password = document.querySelector("#password").value;
+            alert("going here too!!");
+            fetch('/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    username: username,
+                    password: password
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle success, e.g., redirect to homepage
+                    window.location.href = data.redirect_url;
+                })
+                .catch(error => {
+                    // Handle error
+                    console.error('Sign-up failed:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>

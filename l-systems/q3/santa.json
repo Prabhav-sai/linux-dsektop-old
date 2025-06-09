@@ -1,0 +1,14 @@
+{
+    "axiom": "+F",
+    "productions": {
+        "F": "F+F--F+F"
+    },
+    "finals": {
+        "F": "Draws a line from the current position to a new position and translates the context.",
+        "+": "Rotates the context clockwise by a specified angle.",
+        "-": "Rotates the context counterclockwise by a specified angle.",
+        "[": "Saves the current drawing state.",
+        "]": "Restores the saved drawing state."
+    },
+    "angle":"75"
+}

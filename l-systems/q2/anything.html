@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.2.0/lib/p5.js">
+    </script>
+</head>
+
+<body>
+    <script>
+        let rules = {
+            "X1":"F - [[-X] + X] + F[+F X] - X",
+            "X2":"F + [[+X] - X] - F[-F X] + X[X]",
+            "F1":"F[F]F",
+            "F2":"F[+]F",
+            "F3":"F[FF]F"
+        }
+        let length = 10;
+        let angle = 12.5;
+
+        let drawrules;
+        let axiom = "X";
+        let word = axiom;
+        var n;
+
+
+
+        function setup() {
+
+            // Canvas size 400*400
+            createCanvas(screen.height, screen.height);
+            drawrules = {
+                "F": () => {
+                    line(0, 0, 0, -length);
+                    translate(0, -length);
+                },
+                "G": () => {
+                    translate(0, -length);
+                },
+                "-": () => {
+                    rotate(PI / 180 * -angle);
+                },
+                "+": () => {
+                    rotate(PI / 180 * +angle);
+                },
+                "[": push,
+                "]": pop,
+            }
+            iterate(4);
+            // word = "F+F+F+F";
+
+            noLoop();
+        }
+
+        function draw() {
+
+            // Background color blue
+            background('grey');
+            translate(width / 2, height - 100);
+            for (let i = 0; i < word.length; i++) {
+                let c = word[i];
+                if (c in drawrules) {
+                    drawrules[c]();
+                }
+            }
+        }
+        function iterate(iter) {
+            for (let i = 0; i < iter; i++) {
+                word = generate();
+            }
+            return;
+        }
+        function generate() {
+            let next_word = "";
+
+            for (let i = 0; i < word.length; i++) {
+                let c = word[i];
+                n = random()*100;
+                // console.log(n);
+                n = Math.floor(n);
+                if (c == "X") {
+                    
+                    c += (n%2+1).toString();
+                    // console.log(c);
+                    next_word += rules[c];
+                }
+                else if(c == "F"){
+                    c+= (n%3+1).toString();
+                    // console.log(c);
+                    next_word += rules[c];
+                }
+                else{
+                    next_word+=c;
+                }
+            }
+            // console.log(next_word);
+            return next_word;
+        }
+    </script>
+</body>
+
+</html>

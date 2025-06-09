@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html id="Page">
+
+<head>
+    <title>Page Title</title>
+    <style>
+        @font-face {
+            font-family: "ICELAND";
+            src: url(Iceland-Regular.ttf);
+        }
+
+        #clock {
+            color: black;
+            text-align: center;
+            font-size: 270px;
+            padding: 120px;
+            font-family: ICELAND;
+        }
+
+        /* .button {
+            background-color: #04AA6D;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 20px;
+        } */    
+        .button {
+            align-items: center;
+            background-image: linear-gradient(144deg, #AF40FF, #5B42F3 50%, #00DDEB);
+            border-radius: 8px;
+            box-shadow: rgba(151, 65, 252, 0.2) 0 8px 15px -5px;
+            box-sizing: border-box;
+            color: #FFFFFF;
+            display: flex;
+            font-family: ICELAND;
+            font-size: 25px;
+            justify-content: center;
+            max-width: 100%;
+            min-width: 140px;
+            padding: 5px;
+            touch-action: manipulation;
+            cursor: pointer;
+        }
+
+        .button span {
+            background-color: rgb(5, 6, 45);
+            padding: 8px 12px;
+            border-radius: 6px;
+            height: 100%;
+            transition: 300ms;
+        }
+
+        .button:hover span {
+            background: none;
+        }
+
+        .center {
+            display: flex;
+            justify-content: center;
+        }
+
+        #Page {
+            background-image: url(https://img.freepik.com/premium-photo/ultra-hd-highresolution-faded-blue-color-wallpaper_1018894-949.jpg?size=626&ext=jpg&ga=GA1.1.1826414947.1700265600&semt=ais);
+            background-size: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="clock"></div>
+    <script>
+        var check = 1;
+        function time() {
+            var a = new Date();
+            var hour = a.getHours().toString().padStart(2, '0');
+            // if(hour<10) hour = "0"+hour;
+            var min = a.getMinutes().toString().padStart(2, '0');
+            // if(min<10) min = "0" + min;
+            var sec = a.getSeconds().toString().padStart(2, '0');
+            //if(sec<10) sec="0"+sec;
+            if (check == 0) {
+                document.getElementById("clock").innerHTML = hour + ":" + min + ":" + sec;
+            }
+            else {
+                var ap;
+                if (hour > 12) ap = "PM";
+                else ap = "AM";
+                document.getElementById("clock").innerHTML = (hour % 12).toString().padStart(2, '0') + ":" + min + ":" + sec + "    " + ap;
+            }
+        }
+        setInterval(time, 100);
+    </script>
+    <div class="center">
+        <!-- <button class="button" onclick="check=1-check">CHANGE FORMAT</button> -->
+        <button class="button" onclick="check=1-check"><span class="text">CHANGE FORMAT</span></button>
+    </div>
+
+</body>
+
+</html>

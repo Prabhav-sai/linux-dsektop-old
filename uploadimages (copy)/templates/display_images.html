@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploaded Images</title>
+    <style>
+        .uploaded-image {
+            width: 300px;
+            height: auto; 
+            margin-bottom: 20px; 
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- <h1>Uploaded Images</h1> -->
+    <!-- Display uploaded images here -->
+    {% for image in upload_images %}
+        <img class="uploaded-image" src="{{ image }}" alt="Uploaded Image">
+    {% endfor %}
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="video_cus.css"> -->
+    <title>Make Video</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+
+        .main {
+            padding: 5%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .header {
+            text-align: center;
+            line-height: 25px;
+        }
+
+        .queued-form {
+            width: 100%;
+            gap: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .queue {
+            width: 80%;
+            min-height: 200px;
+            border-radius: 30px;
+            border: 2px solid black;
+            align-self: center;
+            display: flex;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 15px;
+            position: relative;
+            padding: 1%;
+        }
+
+        img {
+            height: 150px;
+            border-radius: 10px;
+        }
+
+        .queue .image {
+            /* height: 150px; */
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        .queue .image:nth-child(4n) {
+            margin-right: 0;
+        }
+
+        .queue .image span {
+            position: absolute;
+            top: -4px;
+            right: 4px;
+            cursor: pointer;
+            font-size: 30px;
+            color: black;
+        }
+
+        .queue .image span:hover {
+            font-size: 35px;
+            opacity: 0.8;
+        }
+
+        .queue .span--hidden {
+            visibility: hidden;
+        }
+
+        button {
+            padding: 5px;
+            width: 120px;
+            color: white;
+            font-family: inherit;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 30px;
+            border: 1px solid black;
+            background-color: black;
+            box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.5);
+            font-size: 0.9rem;
+            transition: 0.7s;
+        }
+
+        button:hover {
+            width: 150px;
+            transform: translate(0, 10%);
+        }
+
+        .video {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #preview,
+        #final {
+            display: none;
+        }
+
+        #username {
+            font-size: xx-large;
+            position: fixed;
+            top: 2vh;
+            left: 2vh;
+            z-index: 100;
+            border-color: aqua;
+        }
+    </style>
+</head>
+
+<body>
+    <p id="username">Error</p>
+    <div class="main">
+        <div class="header">
+            <h1>Make Video</h1>
+        </div>
+        <div class="display-img">
+            <img src="img1.jpeg" alt="img" class="onclicks"><img src="img2.jpeg" alt="img" class="onclicks"><img
+                src="img3.jpeg" alt="img" class="onclicks">
+            <img src="img1.jpeg" alt="img" class="onclicks"><img src="img2.jpeg" alt="img" class="onclicks"><img
+                src="img3.jpeg" alt="img" class="onclicks">
+            <img src="img1.jpeg" alt="img" class="onclicks"><img src="img2.jpeg" alt="img" class="onclicks"><img
+                src="img3.jpeg" alt="img" class="onclicks">
+        </div>
+        <form class="queued-form">
+            <div class="header">
+                <h3>Selected Images</h3>
+            </div>
+            <div class="queue"></div>
+        </form>
+    </div>
+    <div class="video">
+        <p>BackgroundMusic :</p>
+        <input type="file" id="backgroundMusic" accept="audio/*" placeholder="click to add music">
+        <label for="imageDuration">Image Duration (in seconds):</label>
+        <input type="number" id="imageDuration" min="1" step="1" value="5">
+        <label for="transitionEffect">Transition Effect:</label>
+        <select id="transitionEffect">
+            <option value="fade">Fade</option>
+            <option value="slide">Slide</option>
+        </select>
+        <br>
+        <button onclick="preview()">Preview Video</button><br>
+        <video width="200px" controls id="preview">
+            <source src="video.mp4" type="video/mp4">
+        </video><br>
+        <button onclick="final()">Create Video</button><br>
+        <video width="200px" controls id="final">
+            <source src="video.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const [header, payload, signature] = token.split('.');
+        const decodedPayload = JSON.parse(atob(payload));
+        document.querySelector('#username').innerHTML = decodedPayload.sub;
+
+        let queued_img_array = [];
+        const queue = document.querySelector(".queue");
+        const displayImages = document.querySelectorAll(".display-img .onclicks");
+
+        displayImages.forEach(image => {
+            image.addEventListener("click", () => {
+                addImageToQueue(image);
+            });
+        });
+
+        function addImageToQueue(image) {
+            const imgSrc = image.src;
+            queued_img_array.push(imgSrc);
+            displayQueuedImages();
+        }
+
+        function displayQueuedImages() {
+            let images = "";
+            queued_img_array.forEach((image, index) => {
+                images += `<div class="image">
+                    <img src="${image}" alt="image">
+                    <span onclick="deleteQueuedImage(${index})">&times;</span>
+                  </div>`;
+            });
+            queue.innerHTML = images;
+        }
+
+        function deleteQueuedImage(index) {
+            queued_img_array.splice(index, 1);
+            displayQueuedImages();
+        }
+
+        const queuedForm = document.querySelector(".queued-form");
+        queuedForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            console.log("Queued images:", queued_img_array);
+            queued_img_array = [];
+            displayQueuedImages();
+        });
+
+
+        function preview() {
+            document.querySelector("#preview").style.display = "block";
+        }
+
+        function final() {
+            document.querySelector("#final").style.display = "block";
+        }
+    </script>
+</body>
+
+</html>

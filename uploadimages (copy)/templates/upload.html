@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="upload.css"> -->
+    <title>Upload Images</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+
+        .main {
+            padding: 5%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .header {
+            text-align: center;
+            line-height: 25px;
+        }
+
+        .input-box {
+            width: 80%;
+            height: 200px;
+            border-radius: 30px;
+            border: 2px solid black;
+            margin-top: 10px;
+            align-self: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .input-box span {
+            color: black;
+            font-weight: bold;
+        }
+
+        .queued-form {
+            width: 100%;
+            gap: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .queue {
+            width: 80%;
+            min-height: 200px;
+            border-radius: 30px;
+            border: 2px solid black;
+            align-self: center;
+            display: flex;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 15px;
+            position: relative;
+            padding: 1%;
+        }
+
+        img {
+            height: 150px;
+            border-radius: 10px;
+        }
+
+        .queue .image {
+            /* height: 150px; */
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        .queue .image:nth-child(4n) {
+            margin-right: 0;
+        }
+
+        .queue .image span {
+            position: absolute;
+            top: -4px;
+            right: 4px;
+            cursor: pointer;
+            font-size: 30px;
+            color: black;
+        }
+
+        .queue .image span:hover {
+            font-size: 35px;
+            opacity: 0.8;
+        }
+
+        .queue .span--hidden {
+            visibility: hidden;
+        }
+
+        button {
+            padding: 10px;
+            width: 70px;
+            color: white;
+            font-family: inherit;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 1px solid black;
+            background-color: black;
+            box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.5);
+            font-size: 0.9rem;
+            transition: 0.7s;
+        }
+
+        button:hover {
+            width: 90px;
+            transform: translate(0, 10%);
+        }
+
+        #username {
+            font-size: xx-large;
+            position: fixed;
+            top: 2vh;
+            left: 2vh;
+            z-index: 100;
+            border-color: aqua;
+        }
+    </style>
+</head>
+
+<body>
+    <p id="username">Error</p>
+    <div class="main">
+        <div class="header">
+            <h1>Upload Images</h1>
+        </div>
+        <label for="image" class="input-box">
+            <p>Drag & Drop Images or click to <span>Browse</span></p>
+            <input type="file" class="file" name="file" id="image" multiple="multiple" accept="image/png, image/jpg, image/jpeg"
+                hidden>
+        </label>
+        <form class="queued-form">
+            <div class="header">
+                <h3>Queued Images</h3>
+                <p>Click on upload to upload to your server.</p>
+            </div>
+            <div class="queue"></div>
+            <button type="button" onclick="uploadImages()">Upload</button>
+        </form>
+    </div>
+    <!-- <script src="upload.js"></script> -->
+    <script>
+
+        const token= localStorage.getItem('token');
+        const [header,payload,signature]=token.split('.');
+        const decodedPayload=JSON.parse(atob(payload));
+        document.querySelector('#username').innerHTML=decodedPayload.sub;
+
+        let queued_img_array = [];
+        let image_blobs = [];
+        let image_names = [];
+        let image_extensions = [];
+        let image_sizes = [];
+
+
+        queuedform = document.querySelector(".queued-form");
+        queue = document.querySelector(".queue");
+        input = document.querySelector(".input-box input");
+        inputbox = document.querySelector(".input-box");
+
+        input.addEventListener("change", () => {
+            const files = input.files;
+            for (let i = 0; i < files.length; i++) {
+                getFileMetadata(files[i]);
+                queued_img_array.push(files[i]);
+            }
+            queuedform.reset();
+            displayQueuedImages();
+        });
+
+        inputbox.addEventListener("dragover", (e) => {
+            e.preventDefault();
+        });
+
+        inputbox.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            for (let i = 0; i < files.length; i++) {
+                if (!files[i].type.match("image")) continue;
+                getFileMetadata(files[i]);
+                queued_img_array.push(files[i]);
+            }
+            displayQueuedImages();
+        });
+
+        function getFileMetadata(file) {
+            const reader = new FileReader.readAsArrayBuffer();
+            reader.onload = function (event) {
+                const blob = event.target.result
+                // const blob = dataURItoBlob(imagedata);
+                const imageName = file.name;
+                const extension = imageName.split('.').pop().toLowerCase();
+                const size = file.size;
+
+                // Push each property into its respective array
+                // console.log(blob);
+                // alert(blob);
+                image_blobs.push(blob);
+                image_names.push(imageName);
+                image_extensions.push(extension);
+                image_sizes.push(size);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function displayQueuedImages() {
+        let images = ""
+            queued_img_array.forEach((image, index) => {
+                images += `<div class="image">
+                    <img src="${URL.createObjectURL(image)}" alt="image">
+                    <span onclick="deleteQueuedImage(${index})">&times;</span>
+                  </div>`
+            })
+            queue.innerHTML = images
+        }
+
+        function deleteQueuedImage(index) {
+            queued_img_array.splice(index, 1);
+            image_blobs.splice(index, 1);
+            image_extensions.splice(index, 1);
+            image_names.splice(index, 1);
+            image_sizes.splice(index, 1);
+            displayQueuedImages();
+        }
+        function uploadImages() {
+            // Send data to the server
+            fetch('/upload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json' // Set content type to JSON
+                },
+                body: JSON.stringify({
+                    username:decodedPayload.sub,
+                    images: image_blobs,
+                    names: image_names,
+                    extensions: image_extensions,
+                    sizes: image_sizes
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    alert(data.message);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+</head>
+
+<body>
+    <canvas id="canva"></canvas>
+    <script src="lindenmayer.browser.js"></script>
+    <script>
+        var canvas = document.getElementById("canva");
+        canvas.width = 4000;
+        canvas.height = 4000;
+        var ctx = canvas.getContext("2d");
+        let length = 3.8;
+        let angle = 90;
+        ctx.translate(2700, 100);
+
+        var squares = new LSystem({
+            axiom: 'F + F',
+            productions: {
+                'F': 'F-F++F-F',
+                'F<F>-F': 'F-+F+F'
+            },
+            finals: {
+                'F': () => {
+                    ctx.beginPath()
+                    ctx.moveTo(0, 0)
+                    ctx.lineTo(0, length)
+                    ctx.stroke()
+                    ctx.translate(0, length)
+                },
+                'G': () => {
+                    ctx.translate(0, length)
+                },
+                '+': () => { ctx.rotate((Math.PI / 180) * +angle) },
+                '-': () => { ctx.rotate((Math.PI / 180) * -angle) },
+                '[': () => { ctx.save() },
+                ']': () => { ctx.restore()},
+            }
+        })
+
+        console.log(squares.iterate(9))
+        squares.final()
+    </script>
+</body>
+
+</html>

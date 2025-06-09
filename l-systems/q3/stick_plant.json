@@ -1,0 +1,16 @@
+{
+    "axiom": "F",
+    "productions": {
+        "F": "KG[+F]F[-F]GKF",
+        "K": "KG"
+    },
+    "finals": {
+        "F": "Draws a line from the current position to a new position and translates the context.",
+        "G": "Draws a line from the current position to a new position and translates the context, but with a different length.",
+        "+": "Rotates the context clockwise by a specified angle.",
+        "-": "Rotates the context counterclockwise by a specified angle.",
+        "[": "Saves the current drawing state.",
+        "]": "Restores the saved drawing state."
+    },
+    "angle":"45"
+}
